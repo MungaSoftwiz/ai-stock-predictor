@@ -60,7 +60,31 @@ async function fetchStockData() {
 }
 
 async function fetchReport(data) {
+    const messages = [
+        {
+            role: 'system',
+            content: 'You are a trading expert. Given data on stock share prices over the past three days, write a report of no more than 150 words describing the stocks performance and recommending whether to buy, hold or sell.'
+        },
+        {
+            role: 'user',
+            content: data
+        }
+    ]
 
+    try {
+        const openai = new OpenAI({
+            dangerouslyAllowBrowser: true
+        })
+        const response = await openai.chat.completions.create({
+            model: 'gpt-4',
+            messages: messages
+        })
+        renderReport(response.choices[0].message.content)
+
+    } catch (err) {
+        console.log('Error:', err)
+        loadingArea.innerText = 'Unable to access AI. Please refresh and try again.'
+    }
 }
 
 function renderReport(output) {
